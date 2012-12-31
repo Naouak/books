@@ -13,6 +13,10 @@ class Config {
 
 // Define possibles values for database entry
 class Translations {
+
+    //You may define here the different type of reading you do.
+    // Key is the value in the database
+    // Value is the display value
     static $type = array(
         "manga" => "manga",
         "novel" => "roman",
@@ -22,6 +26,7 @@ class Translations {
         "bd" => "bande dessinée"
     );
 
+    //Same with languages
     static $language = array(
         "french" => "Français",
         "english" => "Anglais",
