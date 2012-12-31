@@ -5,18 +5,22 @@ require_once("bootstrap.php");
     $q->execute();
     $booklist = $q->fetchAll(PDO::FETCH_ASSOC);
 
-    $q = DatabaseFactory::getDB()->prepare("SELECT type, COUNT(id) as count, MAX(readdate) as lastread FROM book GROUP BY type WITH ROLLUP");
+    $q = DatabaseFactory::getDB()->prepare("SELECT type, COUNT(id) as count, MAX(readdate) as lastread FROM book GROUP BY type");
     $q->execute();
     $readbytypes = ($q->fetchAll(PDO::FETCH_ASSOC));
 
-    $q = DatabaseFactory::getDB()->prepare("SELECT MONTH(readdate) as month, COUNT(id) as count FROM book GROUP BY MONTH(readdate) WITH ROLLUP");
+    $q = DatabaseFactory::getDB()->prepare("SELECT MONTH(readdate) as month, COUNT(id) as count FROM book GROUP BY MONTH(readdate)");
     $q->execute();
     $readbymonths = ($q->fetchAll(PDO::FETCH_ASSOC));
 
 
-    $q = DatabaseFactory::getDB()->prepare("SELECT language, COUNT(id) as count FROM book GROUP BY language WITH ROLLUP");
+    $q = DatabaseFactory::getDB()->prepare("SELECT language, COUNT(id) as count FROM book GROUP BY language");
     $q->execute();
     $readbylanguages = ($q->fetchAll(PDO::FETCH_ASSOC));
+
+$q = DatabaseFactory::getDB()->prepare("SELECT bookname, COUNT(id) as count, MAX(readdate) as lastread FROM book GROUP BY bookname");
+$q->execute();
+$readbyseries = ($q->fetchAll(PDO::FETCH_ASSOC));
 
 ?><!doctype html>
 <html>
@@ -30,156 +34,217 @@ require_once("bootstrap.php");
     <body>
         <div class="container">
             <h1>Lectures de <?=Config::$displayname; ?> en 2013</h1>
-
-            <table class="table table-stripped table-hover">
-                <caption>Livres lus en 2013</caption>
-                <thead>
-                    <tr>
-                        <th>Date de lecture</th>
-                        <th>Titre</th>
-                        <th>Volume</th>
-                        <th>Langue</th>
-                        <th>Type de livre</th>
-                        <th>Appréciation</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php
-                if(sizeof($booklist) > 0){
-                    foreach ($booklist as $book) {
-                        ?>
+            <div id="stats-tabs">
+            <ul class="nav nav-tabs" data-toggle="tab">
+                <li><a href="#read">Historique</a></li>
+                <li><a href="#readbytype">Par type</a></li>
+                <li><a href="#readbymonth">Par mois</a></li>
+                <li><a href="#readbylanguage">Par langue</a></li>
+                <li><a href="#readbyseries">Par série</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane" id="read">
+                    <table class="table table-stripped table-hover">
+                        <caption>Livres lus en 2013</caption>
+                        <thead>
                         <tr>
-                            <td><?=$book["readdate"]; ?></td>
-                            <td><?=$book["bookname"]; ?></td>
-                            <td><?=$book["volumenumber"]; ?></td>
-                            <td><?=ucfirst(Translations::$language[$book["language"]]); ?></td>
-                            <td><?=ucfirst(Translations::$type[$book["type"]]); ?></td>
-                            <td><?php
-                                if($book["liked"] == 1){
-                                    echo "<span class='icon-thumbs-up'></span>";
-                                } else if($book["liked"] == -1){
-                                    echo "<span class='icon-thumbs-down'></span>";
-
-                                } else {
-
-                                }
-                                ;
-                             ?></td>
+                            <th>Date de lecture</th>
+                            <th>Titre</th>
+                            <th>Volume</th>
+                            <th>Langue</th>
+                            <th>Type de livre</th>
+                            <th>Appréciation</th>
                         </tr>
+                        </thead>
+                        <tbody>
                         <?php
-                    }
-                } else {
-                    ?>
-                    <tr class="warning">
-                        <td colspan="6"><strong>Pas de livre lu encore de l'année</strong></td>
-                    </tr>
-                    <?php
-                }
+                        if(sizeof($booklist) > 0){
+                            foreach ($booklist as $book) {
+                                ?>
+                                <tr>
+                                    <td><?=$book["readdate"]; ?></td>
+                                    <td><?=$book["bookname"]; ?></td>
+                                    <td><?=$book["volumenumber"]; ?></td>
+                                    <td><?=ucfirst(Translations::$language[$book["language"]]); ?></td>
+                                    <td><?=ucfirst(Translations::$type[$book["type"]]); ?></td>
+                                    <td><?php
+                                        if($book["liked"] == 1){
+                                            echo "<span class='icon-thumbs-up'></span>";
+                                        } else if($book["liked"] == -1){
+                                            echo "<span class='icon-thumbs-down'></span>";
 
-                ?>
-                </tbody>
-            </table>
+                                        } else {
 
-            <table class="table table-stripped table-hover">
-                <caption>
-                    Nombre de livre lus par type
-                </caption>
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Nombre de livres lus</th>
-                        <th>Dernier livre lu</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php
-                if(sizeof($readbytypes) > 1){
-                    foreach ($readbytypes as $line) {
-                        ?>
-                        <tr>
-                            <td><?php echo ucfirst($line["type"]?:"Total"); ?></td>
-                            <td><?php echo $line["count"]; ?></td>
-                            <td><?php echo $line["lastread"]; ?></td>
-                        </tr>
+                                        }
+                                        ;
+                                        ?></td>
+                                </tr>
+                            <?php
+                            }
+                        } else {
+                            ?>
+                            <tr class="warning">
+                                <td colspan="6"><strong>Pas de livre lu encore de l'année</strong></td>
+                            </tr>
                         <?php
-                    }
+                        }
 
-                } else {
-                    ?>
-                    <tr class="warning">
-                        <td colspan="3"><strong>Pas de livre lu encore de l'année</strong></td>
-                    </tr>
-                <?php
-                }
-                ?>
-                </tbody>
-            </table>
-
-            <table class="table table-stripped table-hover">
-                <caption>
-                    Nombre de livre lus par mois
-                </caption>
-                <thead>
-                <tr>
-                    <th>Mois</th>
-                    <th>Nombre de livres lus</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php
-                if(sizeof($readbymonths) > 1){
-                    foreach ($readbymonths as $line) {
                         ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane" id="readbytype">
+                    <table class="table table-stripped table-hover">
+                        <caption>
+                            Nombre de livre lus par type
+                        </caption>
+                        <thead>
                         <tr>
-                            <td><?php echo isset($line["month"])?FullTranslations::$months[$line["month"]-1]:"Total"; ?></td>
-                            <td><?php echo $line["count"]; ?></td>
+                            <th>Type</th>
+                            <th>Nombre de livres lus</th>
+                            <th>Dernier livre lu</th>
                         </tr>
-                    <?php
-                    }
+                        </thead>
+                        <tbody>
+                        <?php
+                        if(sizeof($readbytypes) > 0){
+                            foreach ($readbytypes as $line) {
+                                ?>
+                                <tr>
+                                    <td><?php echo ucfirst($line["type"]?:"Total"); ?></td>
+                                    <td><?php echo $line["count"]; ?></td>
+                                    <td><?php echo $line["lastread"]; ?></td>
+                                </tr>
+                            <?php
+                            }
 
-                } else {
-                    ?>
-                    <tr class="warning">
-                        <td colspan="2"><strong>Pas de livre lu encore de l'année</strong></td>
-                    </tr>
-                <?php
-                }
-                ?>
-                </tbody>
-            </table>
-
-            <table class="table table-stripped table-hover">
-                <caption>
-                    Nombre de livre lus par langues
-                </caption>
-                <thead>
-                <tr>
-                    <th>Langue</th>
-                    <th>Nombre de livres lus</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php
-                if(sizeof($readbylanguages) > 1){
-                    foreach ($readbylanguages as $line) {
+                        } else {
+                            ?>
+                            <tr class="warning">
+                                <td colspan="3"><strong>Pas de livre lu encore de l'année</strong></td>
+                            </tr>
+                        <?php
+                        }
                         ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane" id="readbymonth">
+                    <table class="table table-stripped table-hover">
+                        <caption>
+                            Nombre de livre lus par mois
+                        </caption>
+                        <thead>
                         <tr>
-                            <td><?php echo isset($line["language"])?FullTranslations::$language[$line["language"]]:"Toutes"; ?></td>
-                            <td><?php echo $line["count"]; ?></td>
+                            <th>Mois</th>
+                            <th>Nombre de livres lus</th>
                         </tr>
-                    <?php
-                    }
+                        </thead>
+                        <tbody>
+                        <?php
+                        if(sizeof($readbymonths) > 0){
+                            foreach ($readbymonths as $line) {
+                                ?>
+                                <tr>
+                                    <td><?php echo isset($line["month"])?FullTranslations::$months[$line["month"]-1]:"Total"; ?></td>
+                                    <td><?php echo $line["count"]; ?></td>
+                                </tr>
+                            <?php
+                            }
 
-                } else {
-                    ?>
-                    <tr class="warning">
-                        <td colspan="2"><strong>Pas de livre lu encore de l'année</strong></td>
-                    </tr>
-                <?php
-                }
-                ?>
-                </tbody>
-            </table>
+                        } else {
+                            ?>
+                            <tr class="warning">
+                                <td colspan="2"><strong>Pas de livre lu encore de l'année</strong></td>
+                            </tr>
+                        <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane" id="readbylanguage">
+                    <table class="table table-stripped table-hover">
+                        <caption>
+                            Nombre de livre lus par langues
+                        </caption>
+                        <thead>
+                        <tr>
+                            <th>Langue</th>
+                            <th>Nombre de livres lus</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                        if(sizeof($readbylanguages) > 0){
+                            foreach ($readbylanguages as $line) {
+                                ?>
+                                <tr>
+                                    <td><?php echo isset($line["language"])?FullTranslations::$language[$line["language"]]:"Toutes"; ?></td>
+                                    <td><?php echo $line["count"]; ?></td>
+                                </tr>
+                            <?php
+                            }
+
+                        } else {
+                            ?>
+                            <tr class="warning">
+                                <td colspan="2"><strong>Pas de livre lu encore de l'année</strong></td>
+                            </tr>
+                        <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tab-pane" id="readbyseries">
+                    <table class="table table-stripped table-hover">
+                        <caption>
+                            Nombre de livre lus par series
+                        </caption>
+                        <thead>
+                        <tr>
+                            <th>Series</th>
+                            <th>Nombre de livres lus</th>
+                            <th>Date de dernière lecture</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                        if(sizeof($readbyseries) > 0){
+                            foreach ($readbyseries as $line) {
+                                ?>
+                                <tr>
+                                    <td><?php echo isset($line["bookname"])?$line["bookname"]:"Toutes"; ?></td>
+                                    <td><?php echo $line["count"]; ?></td>
+                                    <td><?php echo $line["lastread"]; ?></td>
+                                </tr>
+                            <?php
+                            }
+
+                        } else {
+                            ?>
+                            <tr class="warning">
+                                <td colspan="3"><strong>Pas de livre lu encore de l'année</strong></td>
+                            </tr>
+                        <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+            </div>
+            </div>
+
+
+
+
+
+
 <?php
 if(Utilities::is_logged()){
 ?>
@@ -259,6 +324,15 @@ if(Utilities::is_logged()){
 <?php
 }
 ?>
+            <script src="http://yui.yahooapis.com/3.8.0/build/yui/yui.js"></script>
+            <script type="text/javascript">
+                YUI({
+                    combine:false,
+                    gallery: 'gallery-2012.08.22-20-00'
+                }).use("gallery-bootstrap-tabview",function(Y){
+                    var tabs = new Y.Bootstrap.TabView({node: '#stats-tabs'});
+                });
+            </script>
         </div>
     </body>
 </html>
