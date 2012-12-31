@@ -1,0 +1,34 @@
+<?php
+
+class Config {
+    static $displayname = "Naouak";
+    static $username = "root";
+    static $password = "";
+    static $host = "localhost";
+    static $database = "naouaks_book";
+    //SHA1 password
+    static $login_password = "sha1 password";
+
+}
+
+// Define possibles values for database entry
+class Translations {
+    static $type = array(
+        "manga" => "manga",
+        "novel" => "roman",
+        "lightnovel" => "light novel",
+        "nonfiction" => "non fiction",
+        "comics" => "comics",
+        "bd" => "bande dessinée"
+    );
+
+    static $language = array(
+        "french" => "Français",
+        "english" => "Anglais",
+        "japanese" => "Japonais"
+    );
+}
+
+//For debugs
+ini_set("show_errors",1);
+error_reporting(E_ERROR);
