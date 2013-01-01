@@ -146,10 +146,7 @@ if(Utilities::is_logged()){
 ?>
             <script src="http://yui.yahooapis.com/3.8.0/build/yui/yui.js"></script>
             <script type="text/javascript">
-                YUI({
-                    combine:false,
-                    gallery: 'gallery-2012.08.22-20-00'
-                }).use("gallery-bootstrap-tabview",function(Y){
+                YUI().use("gallery-bootstrap-tabview",function(Y){
                     var tabs = new Y.Bootstrap.TabView({node: '#stats-tabs'});
                 });
             </script>
