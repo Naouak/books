@@ -246,7 +246,7 @@ $readbyseries = ($q->fetchAll(PDO::FETCH_ASSOC));
                             Ce qui veut dire que plus une série aura un grand nombre de volumes lus, plus elle a de chance d'avoir une note proche de la réalité.
                         </p>
                         <p>
-                            Notez que cette notation est une expérience afin de voir si elle exprime mieux un avis sur une série qu'une note donnée subjectement à la fin de la lecture globale.
+                            Notez que cette notation est une expérience afin de voir si elle exprime mieux un avis sur une série qu'une note donnée subjectivement à la fin de la lecture globale.
                         </p>
                     </div>
                 </div>
