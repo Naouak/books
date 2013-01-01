@@ -11,6 +11,8 @@ if ($handle = opendir('tabs')) {
         }
     }
     closedir($handle);
+
+    sort($tabs);
 }
 
    foreach($tabs as $k => $v){
@@ -59,12 +61,6 @@ if ($handle = opendir('tabs')) {
                 ?>
             </div>
             </div>
-
-
-
-
-
-
 <?php
 if(Utilities::is_logged()){
 ?>
