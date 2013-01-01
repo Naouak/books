@@ -18,7 +18,7 @@ require_once("bootstrap.php");
     $q->execute();
     $readbylanguages = ($q->fetchAll(PDO::FETCH_ASSOC));
 
-$q = DatabaseFactory::getDB()->prepare("SELECT bookname, COUNT(id) as count, MAX(readdate) as lastread FROM book GROUP BY bookname");
+$q = DatabaseFactory::getDB()->prepare("SELECT bookname, COUNT(id) as count, MAX(readdate) as lastread, AVG(liked)*10+10 as liked FROM book GROUP BY bookname ORDER BY liked DESC");
 $q->execute();
 $readbyseries = ($q->fetchAll(PDO::FETCH_ASSOC));
 
@@ -207,6 +207,7 @@ $readbyseries = ($q->fetchAll(PDO::FETCH_ASSOC));
                         <tr>
                             <th>Series</th>
                             <th>Nombre de livres lus</th>
+                            <th>Appréciation</th>
                             <th>Date de dernière lecture</th>
                         </tr>
                         </thead>
@@ -218,6 +219,7 @@ $readbyseries = ($q->fetchAll(PDO::FETCH_ASSOC));
                                 <tr>
                                     <td><?php echo isset($line["bookname"])?$line["bookname"]:"Toutes"; ?></td>
                                     <td><?php echo $line["count"]; ?></td>
+                                    <td><?php echo round($line["liked"],2); ?>/20</td>
                                     <td><?php echo $line["lastread"]; ?></td>
                                 </tr>
                             <?php
@@ -226,13 +228,27 @@ $readbyseries = ($q->fetchAll(PDO::FETCH_ASSOC));
                         } else {
                             ?>
                             <tr class="warning">
-                                <td colspan="3"><strong>Pas de livre lu encore de l'année</strong></td>
+                                <td colspan="4"><strong>Pas de livre lu encore de l'année</strong></td>
                             </tr>
                         <?php
                         }
                         ?>
                         </tbody>
                     </table>
+
+                    <div class="alert alert-info">
+                        <p><strong>Attention sur la notation !</strong></p>
+                        <p>
+                            La notation des séries est issue d'une notation par volume selon le ressenti à la fin de chaque tome.
+                            Chaque livre est noté sur une échelle à trois points : aimé, indifférent, pas aimé.
+                        </p>
+                        <p>
+                            Ce qui veut dire que plus une série aura un grand nombre de volumes lus, plus elle a de chance d'avoir une note proche de la réalité.
+                        </p>
+                        <p>
+                            Notez que cette notation est une expérience afin de voir si elle exprime mieux un avis sur une série qu'une note donnée subjectement à la fin de la lecture globale.
+                        </p>
+                    </div>
                 </div>
 
 
