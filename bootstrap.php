@@ -38,4 +38,13 @@ class FullTranslations extends Translations{
         "Novenbre",
         "Décembre"
     );
+    static $days = array(
+        "Dimanche",
+        "Lundi",
+        "Mardi",
+        "Mercredi",
+        "Jeudi",
+        "Vendredi",
+        "Samedi"
+    );
 }
