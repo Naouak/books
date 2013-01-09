@@ -36,6 +36,7 @@ if ($handle = opendir('tabs')) {
         <meta charset="utf-8">
         <link rel="stylesheet" href="assets/css/bootstrap.css">
         <link rel="stylesheet" href="assets/css/bootstrap-responsive.css">
+        <script src="http://yui.yahooapis.com/3.8.0/build/yui/yui.js"></script><?php/*I know I should put it at the end but I don't really care about perfs for this stuff yet.*/?>
     </head>
 
     <body>
@@ -140,9 +141,12 @@ if(Utilities::is_logged()){
 <?php
 }
 ?>
-            <script src="http://yui.yahooapis.com/3.8.0/build/yui/yui.js"></script>
+
             <script type="text/javascript">
-                YUI().use("gallery-bootstrap-tabview",function(Y){
+                YUI({
+                    until: "domready"
+                }).use("gallery-bootstrap-tabview",function(Y){
+                        Y.log("tabs");
                     var tabs = new Y.Bootstrap.TabView({node: '#stats-tabs'});
                 });
             </script>
